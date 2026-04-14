@@ -67,6 +67,11 @@ export default function LoginPage() {
             />
           </div>
           {error && <p className="text-sm text-red-600 bg-red-50 rounded-lg px-3 py-2">{error}</p>}
+          <div className="flex justify-end">
+            <a href="/forgot-password" className="text-xs text-[#C9A84C] hover:underline">
+              Esqueci minha senha
+            </a>
+          </div>
           <button
             type="submit"
             disabled={loading}
