@@ -40,9 +40,9 @@ export default function MessagesClient({ messages, companyId, userId }: Props) {
           const mine = m.sender_id === userId
           return (
             <div key={m.id} className={`flex ${mine ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-xs md:max-w-sm rounded-2xl px-4 py-2 text-sm ${mine ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800'}`}>
+              <div className={`max-w-xs md:max-w-sm rounded-2xl px-4 py-2 text-sm ${mine ? 'bg-[#0A1628] text-white' : 'bg-gray-100 text-gray-800'}`}>
                 <p>{m.content}</p>
-                <p className={`text-xs mt-1 ${mine ? 'text-indigo-200' : 'text-gray-400'}`}>
+                <p className={`text-xs mt-1 ${mine ? 'text-[#D4B96A]' : 'text-gray-400'}`}>
                   {mine ? 'Você' : (m.profiles as { full_name: string | null } | undefined)?.full_name ?? 'Escritório'}
                   {' · '}
                   {new Date(m.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
@@ -54,14 +54,14 @@ export default function MessagesClient({ messages, companyId, userId }: Props) {
       </div>
       <div className="flex gap-2">
         <input
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
           placeholder="Escreva uma mensagem..."
           value={text}
           onChange={e => setText(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && send()}
         />
         <button disabled={sending || !text.trim()} onClick={send}
-          className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">
+          className="bg-[#0A1628] text-white px-4 py-2 rounded-lg hover:bg-[#060E1A] transition disabled:opacity-50">
           <Send size={16} />
         </button>
       </div>

@@ -18,7 +18,7 @@ export default async function PortalHome() {
 
   const cards = [
     { href: '/portal/documents', label: 'Documentos', count: docs.count ?? 0, icon: FileText, desc: 'Folhas, guias e certificados', color: 'text-blue-600 bg-blue-50' },
-    { href: '/portal/messages', label: 'Mensagens não lidas', count: msgs.count ?? 0, icon: MessageSquare, desc: 'Comunicados do escritório', color: 'text-indigo-600 bg-indigo-50' },
+    { href: '/portal/messages', label: 'Mensagens não lidas', count: msgs.count ?? 0, icon: MessageSquare, desc: 'Comunicados do escritório', color: 'text-[#C9A84C] bg-[#FBF7EE]' },
     { href: '/portal/tasks', label: 'Tarefas pendentes', count: tasks.count ?? 0, icon: CheckSquare, desc: 'Prazos e obrigações', color: 'text-amber-600 bg-amber-50' },
   ]
 

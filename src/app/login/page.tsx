@@ -27,16 +27,20 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 to-[#EDE8D8] px-4">
       <div className="w-full max-w-sm bg-white rounded-2xl shadow-lg p-8">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-indigo-600 mb-4">
-            <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-[#0A1628] mb-4">
+            {/* PSP Logo */}
+            <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+              <text y="76" fontSize="68" fontFamily="Georgia,serif" fill="#C9A84C" x="10" fontWeight="bold">P</text>
+              <rect x="58" y="30" width="24" height="4" rx="2" fill="#C9A84C"/>
+              <rect x="58" y="42" width="18" height="4" rx="2" fill="#C9A84C" opacity="0.6"/>
+              <rect x="58" y="54" width="20" height="4" rx="2" fill="#C9A84C" opacity="0.4"/>
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-800">Portal DP</h1>
-          <p className="text-sm text-gray-500 mt-1">Departamento Pessoal</p>
+          <h1 className="text-2xl font-bold text-gray-800">PSP Contabilidade</h1>
+          <p className="text-sm text-gray-500 mt-1">Área do Cliente</p>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -47,7 +51,7 @@ export default function LoginPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
               placeholder="seu@email.com"
             />
           </div>
@@ -58,7 +62,7 @@ export default function LoginPage() {
               value={password}
               onChange={e => setPassword(e.target.value)}
               required
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A84C] text-sm"
               placeholder="••••••••"
             />
           </div>
@@ -66,7 +70,7 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2.5 bg-indigo-600 text-white rounded-lg font-medium hover:bg-indigo-700 transition disabled:opacity-50 text-sm"
+            className="w-full py-2.5 bg-[#0A1628] text-white rounded-lg font-medium hover:bg-[#060E1A] transition disabled:opacity-50 text-sm"
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>

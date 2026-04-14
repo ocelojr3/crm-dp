@@ -2,13 +2,24 @@
 
 @layer components {
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 text-sm;
+    --tw-ring-color: #C9A84C;
   }
 }
 
 :root {
   --background: #ffffff;
   --foreground: #171717;
+
+  /* PSP Contabilidade brand tokens */
+  --psp-navy-900: #040C1A;
+  --psp-navy-800: #060E1A;
+  --psp-navy-700: #0A1628;
+  --psp-navy-600: #0F1E35;
+  --psp-gold-500: #C9A84C;
+  --psp-gold-400: #D4B96A;
+  --psp-gold-light: #FBF7EE;
+  --psp-gold-muted: #EDE8D8;
 }
 
 @theme inline {
@@ -16,13 +27,6 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 body {

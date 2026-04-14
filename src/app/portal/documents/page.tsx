@@ -28,12 +28,12 @@ export default async function PortalDocuments({ searchParams }: { searchParams: 
 
       {/* Filtros */}
       <div className="flex flex-wrap gap-2">
-        <a href="/portal/documents" className={`px-3 py-1 rounded-full text-sm font-medium border transition ${!params.cat ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+        <a href="/portal/documents" className={`px-3 py-1 rounded-full text-sm font-medium border transition ${!params.cat ? 'bg-[#0A1628] text-white border-[#0A1628]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
           Todos
         </a>
         {CATS.map(c => (
           <a key={c} href={`/portal/documents?cat=${c}${params.year ? `&year=${params.year}` : ''}`}
-            className={`px-3 py-1 rounded-full text-sm font-medium border transition ${params.cat === c ? 'bg-indigo-600 text-white border-indigo-600' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
+            className={`px-3 py-1 rounded-full text-sm font-medium border transition ${params.cat === c ? 'bg-[#0A1628] text-white border-[#0A1628]' : 'border-gray-200 text-gray-600 hover:bg-gray-50'}`}>
             {CAT_LABEL[c]}
           </a>
         ))}
@@ -64,7 +64,7 @@ export default async function PortalDocuments({ searchParams }: { searchParams: 
               </div>
             </div>
             <a href={d.drive_url} target="_blank" rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-sm text-white bg-indigo-600 hover:bg-indigo-700 px-3 py-1.5 rounded-lg transition">
+              className="flex items-center gap-1.5 text-sm text-white bg-[#0A1628] hover:bg-[#060E1A] px-3 py-1.5 rounded-lg transition">
               <ExternalLink size={13} /> Abrir
             </a>
           </div>
