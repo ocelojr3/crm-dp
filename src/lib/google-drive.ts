@@ -2,13 +2,15 @@
  * Google Drive — PSP Contabilidade
  * Integração restrita a: Departamento Pessoal → Folha de Pagamento
  *
- * Estrutura no Drive:
- *   <ROOT_ID>/Contabil/Escrito/Departamento Pessoal/Empresas
- *     └── NOME DA EMPRESA/
- *         └── AAAA-MM/        ← competência
- *             ├── holerite_joao.pdf
- *             ├── FGTS_abril.pdf
- *             └── DARF_inss.pdf
+ * Estrutura real no Drive:
+ *   Empresas/
+ *     └── NOME DA EMPRESA - XXXX/
+ *         ├── FOLHA DE PAGAMENTO/   ← pasta que nos interessa
+ *         │   ├── holerite_joao.pdf
+ *         │   └── DARF_inss.pdf
+ *         ├── FÉRIAS/
+ *         ├── PRO LABORE/
+ *         └── ...
  */
 
 import { google, drive_v3 } from 'googleapis'
@@ -28,12 +30,10 @@ function getDrive(): drive_v3.Drive {
   return google.drive({ version: 'v3', auth: getOAuth2Client() })
 }
 
-// ── ID raiz navegável (shortcut target já é o ID direto no Drive) ──
-// Caminho: <ROOT_SHORTCUT>/Contabil/Escrito/Departamento Pessoal/Empresas
-// O env GOOGLE_DRIVE_ROOT_ID deve ser o ID da pasta logo acima de "Contabil"
-// ou diretamente o ID da pasta "Empresas".
-// Execute node scripts/find-drive-folder.mjs para descobrir automaticamente.
 const EMPRESAS_FOLDER_ID = process.env.GOOGLE_DRIVE_EMPRESAS_FOLDER_ID ?? ''
+
+/** Nome exato da subpasta que contém os arquivos de folha */
+const FOLHA_FOLDER_NAME = 'FOLHA DE PAGAMENTO'
 
 // ── Helpers internos ──────────────────────────────────────────
 
@@ -49,6 +49,8 @@ async function findFolder(
     fields: 'files(id, name)',
     spaces: 'drive',
     pageSize: 5,
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true,
   })
   return res.data.files?.[0]?.id ?? null
 }
@@ -69,27 +71,37 @@ async function findOrCreateFolder(
       parents: [parentId],
     },
     fields: 'id',
+    supportsAllDrives: true,
   })
   return res.data.id!
 }
 
 /**
- * Resolve a pasta de uma empresa e competência:
- *   Empresas/ → <companyName>/ → <competencia>/
- * Se competencia não fornecida, retorna a pasta da empresa.
+ * Resolve a pasta FOLHA DE PAGAMENTO de uma empresa.
+ * Se a subpasta não existir, retorna a pasta da empresa (fallback).
+ * Se competencia fornecida, retorna a subpasta de data dentro de FOLHA DE PAGAMENTO.
  */
-async function resolveFolder(companyName: string, competencia?: string): Promise<string | null> {
-  if (!EMPRESAS_FOLDER_ID) throw new Error('GOOGLE_DRIVE_EMPRESAS_FOLDER_ID não configurado. Execute scripts/find-drive-folder.mjs')
+async function resolvePayrollFolder(
+  companyName: string,
+  competencia?: string
+): Promise<string | null> {
+  if (!EMPRESAS_FOLDER_ID) {
+    throw new Error('GOOGLE_DRIVE_EMPRESAS_FOLDER_ID não configurado')
+  }
   const drive = getDrive()
 
-  // Pasta da empresa (busca exata — NÃO cria automaticamente para evitar duplicatas)
+  // Pasta da empresa (busca exata — não cria automaticamente)
   const companyId = await findFolder(drive, companyName, EMPRESAS_FOLDER_ID)
   if (!companyId) return null
 
-  if (!competencia) return companyId
+  // Pasta "FOLHA DE PAGAMENTO" dentro da empresa
+  const folhaId = await findFolder(drive, FOLHA_FOLDER_NAME, companyId)
+  const targetId = folhaId ?? companyId // fallback: usa pasta da empresa
 
-  // Pasta de competência (cria se não existir)
-  const compId = await findOrCreateFolder(drive, competencia, companyId)
+  if (!competencia) return targetId
+
+  // Subpasta de competência (cria se não existir)
+  const compId = await findOrCreateFolder(drive, competencia, targetId)
   return compId
 }
 
@@ -110,7 +122,7 @@ export interface DriveFile {
 /**
  * Lista arquivos de folha de uma empresa.
  * Se competencia fornecida → lista arquivos daquela competência.
- * Caso contrário → lista todas as subpastas (competências).
+ * Caso contrário → lista subpastas e arquivos dentro de FOLHA DE PAGAMENTO.
  */
 export async function listPayrollFiles(
   companyName: string,
@@ -118,38 +130,39 @@ export async function listPayrollFiles(
 ): Promise<{ files: DriveFile[]; folders: string[] }> {
   const drive = getDrive()
 
-  const targetId = await resolveFolder(companyName, competencia)
+  const targetId = await resolvePayrollFolder(companyName, competencia)
   if (!targetId) return { files: [], folders: [] }
 
-  if (competencia) {
-    // Lista arquivos da competência
-    const res = await drive.files.list({
-      q: `'${targetId}' in parents and trashed = false and mimeType != 'application/vnd.google-apps.folder'`,
-      fields: 'files(id, name, mimeType, size, createdTime, webViewLink, webContentLink)',
-      orderBy: 'name',
-    })
-    return { files: (res.data.files ?? []) as DriveFile[], folders: [] }
-  }
-
-  // Lista subpastas (competências)
+  // Lista tudo dentro da pasta alvo
   const res = await drive.files.list({
-    q: `'${targetId}' in parents and mimeType = 'application/vnd.google-apps.folder' and trashed = false`,
-    fields: 'files(name)',
-    orderBy: 'name desc',
+    q: `'${targetId}' in parents and trashed = false`,
+    fields: 'files(id, name, mimeType, size, createdTime, webViewLink, webContentLink)',
+    orderBy: 'name',
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true,
   })
-  return {
-    files: [],
-    folders: (res.data.files ?? []).map(f => f.name ?? '').filter(Boolean),
-  }
+
+  const all = res.data.files ?? []
+  const folders = all
+    .filter(f => f.mimeType === 'application/vnd.google-apps.folder')
+    .map(f => f.name ?? '')
+    .filter(Boolean)
+
+  const files = all.filter(
+    f => f.mimeType !== 'application/vnd.google-apps.folder'
+  ) as DriveFile[]
+
+  return { files, folders }
 }
 
 /**
- * Faz upload de arquivo de folha para a pasta correta no Drive.
- * Cria a pasta da empresa SE não existir (admin faz primeiro upload).
+ * Faz upload de arquivo para a pasta FOLHA DE PAGAMENTO da empresa.
+ * Se competencia fornecida, cria subpasta de data.
+ * Cria pastas que não existirem automaticamente.
  */
 export async function uploadPayrollFile(
   companyName: string,
-  competencia: string,       // ex: "2025-04"
+  competencia: string,       // ex: "2025-04" ou "ABRIL 2025"
   fileName: string,
   mimeType: string,
   fileBuffer: Buffer
@@ -157,9 +170,10 @@ export async function uploadPayrollFile(
   if (!EMPRESAS_FOLDER_ID) throw new Error('GOOGLE_DRIVE_EMPRESAS_FOLDER_ID não configurado')
   const drive = getDrive()
 
-  // Para upload, cria empresa e competência se não existir
+  // Cria empresa → FOLHA DE PAGAMENTO → competencia
   const companyId = await findOrCreateFolder(drive, companyName, EMPRESAS_FOLDER_ID)
-  const folderId = await findOrCreateFolder(drive, competencia, companyId)
+  const folhaId = await findOrCreateFolder(drive, FOLHA_FOLDER_NAME, companyId)
+  const folderId = await findOrCreateFolder(drive, competencia, folhaId)
 
   const { Readable } = await import('stream')
   const stream = Readable.from(fileBuffer)
@@ -168,12 +182,14 @@ export async function uploadPayrollFile(
     requestBody: { name: fileName, parents: [folderId] },
     media: { mimeType, body: stream },
     fields: 'id, name, mimeType, size, createdTime, webViewLink, webContentLink',
+    supportsAllDrives: true,
   })
 
-  // Torna acessível por link (leitura pública via link)
+  // Torna acessível por link (leitura via link)
   await drive.permissions.create({
     fileId: res.data.id!,
     requestBody: { role: 'reader', type: 'anyone' },
+    supportsAllDrives: true,
   })
 
   return res.data as DriveFile
@@ -181,7 +197,10 @@ export async function uploadPayrollFile(
 
 /** Deleta arquivo do Drive */
 export async function deletePayrollFile(fileId: string): Promise<void> {
-  await getDrive().files.delete({ fileId })
+  await getDrive().files.delete({
+    fileId,
+    supportsAllDrives: true,
+  })
 }
 
 /** Lista empresas (subpastas da pasta Empresas) */
@@ -193,6 +212,8 @@ export async function listCompaniesInDrive(): Promise<string[]> {
     fields: 'files(name)',
     orderBy: 'name',
     pageSize: 500,
+    supportsAllDrives: true,
+    includeItemsFromAllDrives: true,
   })
   return (res.data.files ?? []).map(f => f.name ?? '').filter(Boolean)
 }

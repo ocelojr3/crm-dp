@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     category: 'folha',
     drive_url: driveFile.webViewLink,
     drive_file_id: driveFile.id,
-    drive_folder_path: `${companyName}/${competencia}`,
+    drive_folder_path: `${companyName}/FOLHA DE PAGAMENTO/${competencia}`,
     year,
     month,
     uploaded_by: user.id,
