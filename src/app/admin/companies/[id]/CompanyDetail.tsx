@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import type { Company, ClientDocument, Task, Message } from '@/lib/supabase/types'
 import { ExternalLink, Plus, Send, FolderOpen } from 'lucide-react'
+import DriveUpload from '@/components/DriveUpload'
 
 const MONTHS = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
 const CATS = ['folha','imposto','prontuario','geral'] as const
@@ -129,8 +130,11 @@ export default function CompanyDetail({ company, documents, tasks, messages }: P
       {/* DOCUMENTOS */}
       {tab === 'docs' && (
         <div className="space-y-4">
+          {/* Upload Drive — folha de pagamento */}
+          <DriveUpload companyId={company.id} companyName={company.name} />
+
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 space-y-3">
-            <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1"><Plus size={14} />Adicionar documento</h3>
+            <h3 className="text-sm font-semibold text-gray-700 flex items-center gap-1"><Plus size={14} />Adicionar documento (link manual)</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               <input className="input col-span-2" placeholder="Nome do documento" value={docForm.name} onChange={e => setDocForm(p => ({ ...p, name: e.target.value }))} />
               <select className="input" value={docForm.category} onChange={e => setDocForm(p => ({ ...p, category: e.target.value }))}>
