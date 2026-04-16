@@ -5,8 +5,13 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Portal DP',
-  description: 'Portal do cliente – Departamento Pessoal',
+  title: 'PSP Contabilidade — Área do Cliente',
+  description: 'Portal do cliente – Departamento Pessoal · PSP Contabilidade',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
