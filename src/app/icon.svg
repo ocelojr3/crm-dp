@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Fundo navy -->
+  <rect width="32" height="32" rx="6" fill="#0A1628"/>
+  <!-- Letra P -->
+  <text x="5" y="23" font-family="Georgia, serif" font-weight="700" font-size="20" fill="#C9A84C">P</text>
+  <!-- Linhas douradas (≡) -->
+  <rect x="18" y="10" width="9" height="2" rx="1" fill="#C9A84C"/>
+  <rect x="18" y="14" width="9" height="2" rx="1" fill="#C9A84C"/>
+  <rect x="18" y="18" width="6" height="2" rx="1" fill="#C9A84C"/>
+</svg>
